@@ -8,7 +8,7 @@ namespace AsyncCoder.UserAuth.Extensions
     {
         public static T? Authenticate<T>(this IUserAuthContext<T> db, string email, string password) where T : class, IUser
         {
-            return AuthHelper.Authenticate(db, email, password);
+            return Utility.Authenticate(db, email, password);
         }
 
         /// <summary>
