@@ -63,7 +63,7 @@ namespace AsyncCoder.UserAuth.Authentication
 
         public static T? Authenticate<T>(IUserAuthContext<T> db, string email, string password) where T : class, IUser
         {
-            var user = db.Users.First(u => u.Email == email);
+            var user = db.Users.First(u => u.Email.ToLower() == email.ToLower());
             if (user == null)
             {
                 // Spend time to mask the lack of user, TODO: verify this doesn't get optimized away
