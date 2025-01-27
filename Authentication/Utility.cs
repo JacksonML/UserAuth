@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using AsyncCoder.UserAuth.DbModels;
 using AsyncCoder.UserAuth.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsyncCoder.UserAuth.Authentication
 {
@@ -64,6 +65,25 @@ namespace AsyncCoder.UserAuth.Authentication
         public static T? Authenticate<T>(IUserAuthContext<T> db, string email, string password) where T : class, IUser
         {
             var user = db.Users.First(u => u.Email.ToLower() == email.ToLower());
+            if (user == null)
+            {
+                // Spend time to mask the lack of user, TODO: verify this doesn't get optimized away
+                var test = Utility.Hash("-");
+                return null;
+            }
+            if (Utility.Verify(password, user.SaltedHash))
+            {
+                return user;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+        public static async Task<T?> AuthenticateAsync<T>(IUserAuthContext<T> db, string email, string password) where T : class, IUser
+        {
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (user == null)
             {
                 // Spend time to mask the lack of user, TODO: verify this doesn't get optimized away
